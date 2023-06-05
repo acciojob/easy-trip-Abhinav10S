@@ -22,8 +22,10 @@ public class AirportRepositry {
     public String getLargestAirportName() {
         String ans = ""  ;
         int ans1 = 0 ;
+        ArrayList<String> list = new ArrayList<>(airportTreeMap.keySet()) ;
+        Collections.sort(list);
 
-        for (String name : airportTreeMap.keySet()){
+        for (String name : list){
             int curr  = airportTreeMap.get(name).getNoOfTerminals();
             if(curr>ans1){
                 ans1 = curr ;
@@ -34,7 +36,8 @@ public class AirportRepositry {
     }
 
     public double getShortestDuratrionOfPossibleBetweenTwoCities(City fromCity, City toCity) {
-        double dura = Integer.MAX_VALUE;
+        double dura = Double.MAX_VALUE;
+
         for (Flight flight : flightM.values()){
             if(fromCity.equals(flight.getFromCity()) && toCity.equals(flight.getToCity())){
                 if(dura> flight.getDuration()){
@@ -48,18 +51,14 @@ public class AirportRepositry {
     public int getNumberOfPeopleOn(Date date, String airportName) {
         Airport airport = airportTreeMap.get(airportName) ;
         int count = 0 ;
-        if (airport != null){
-            City city = airport.getCity() ;
-            for (Flight flight : flightM.values()){
-                if(date.equals(flight.getFlightDate())){
-                    if(city.equals(flight.getToCity()) || city.equals(flight.getFromCity())){
-                        Integer flightId  = flight.getFlightId() ;
-                        Set<Integer> set = flightPass.get(flightId) ;
-                        if(set != null){
-                            count+= set.size() ;
-                        }
-                    }
-                }
+        City city  = airportTreeMap.get(airportName).getCity() ;
+        if (!airportTreeMap.containsKey(airportName)) return count ;
+
+        for (int flightId : flightPass.keySet()) {
+            Flight f = flightM.get(flightId);
+
+            if (f.getFlightDate().equals(date) && (f.getFromCity().equals(city) || f.getToCity().equals(city))) {
+                count += flightPass.get(flightId).size() ;
             }
         }
         return  count ;
